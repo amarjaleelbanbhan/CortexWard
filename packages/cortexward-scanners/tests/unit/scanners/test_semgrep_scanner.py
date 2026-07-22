@@ -268,12 +268,13 @@ class TestPrivateHelpers:
         rules_dir = _rules_dir()
         assert rules_dir.is_dir()
         names = {p.name for p in rules_dir.iterdir()}
-        assert names == {
-            "ssrf.yml",
-            "template_injection.yml",
-            "hardcoded_credentials.yml",
-            "jwt_signature_bypass.yml",
-        }
+       assert names == {
+    "ssrf.yml",
+    "template_injection.yml",
+    "hardcoded_credentials.yml",
+    "jwt_signature_bypass.yml",
+    "sql_injection.yml",
+}
 
     def test_rule_id_strips_the_directory_path_prefix(self) -> None:
         assert (
