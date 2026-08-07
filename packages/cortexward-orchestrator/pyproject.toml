@@ -36,7 +36,7 @@ dependencies = [
   "cortexward-sandbox",
   "cortexward-scanners",
   "cortexward-storage",
-  "langgraph>=1.0,<2",
+  "langgraph>=1.2.10,<2",
 ]
 
 [project.urls]

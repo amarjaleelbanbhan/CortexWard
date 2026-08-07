@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-serve = ["uvicorn[standard]>=0.51.0,<1"]
+serve = ["uvicorn[standard]>=0.52.1,<1"]
 
 [project.urls]
 Homepage = "https://github.com/amarjaleelbanbhan/CortexWard"
