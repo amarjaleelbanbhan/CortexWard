@@ -273,6 +273,7 @@ class TestPrivateHelpers:
             "template_injection.yml",
             "hardcoded_credentials.yml",
             "jwt_signature_bypass.yml",
+            "sql_injection.yml",
         }
 
     def test_rule_id_strips_the_directory_path_prefix(self) -> None:

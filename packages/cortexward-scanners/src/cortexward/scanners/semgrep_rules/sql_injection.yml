@@ -1,0 +1,13 @@
+rules:
+  - id: cortexward-sql-injection-format-string
+    languages: [python]
+    severity: ERROR
+    message: >-
+      Possible SQL injection: user-controlled input is directly formatted
+      into a SQL query. Use parameterized queries instead.
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command (SQL Injection)"
+    patterns:
+      - pattern-either:
+          - pattern: $CURSOR.execute(f"...{$INPUT}...")
+          - pattern: $CURSOR.execute("..." + $INPUT)
