@@ -99,6 +99,40 @@ class TestBundledRules:
         ssti_rule_id = "cortexward-ssti-flask-render-template-string"
         assert not any(f.rule_id == ssti_rule_id for f in findings)
 
+    def test_sql_injection_rule_fires_on_common_string_formatting_patterns(
+        self, tmp_path: Path
+    ) -> None:
+        _write(
+            tmp_path,
+            "db.py",
+            "def find(cursor, user_id):\n"
+            "    cursor.execute(f\"SELECT * FROM users WHERE id={user_id}\")\n"
+            "    cursor.execute(\"SELECT * FROM users WHERE id=\" + user_id)\n"
+            "    cursor.execute(\"SELECT * FROM users WHERE id=%s\" % user_id)\n"
+            "    cursor.execute(\"SELECT * FROM users WHERE id={}\".format(user_id))\n",
+        )
+        findings = list(SemgrepScanner().scan(tmp_path))
+        sql = [
+            f for f in findings if f.rule_id == "cortexward-sql-injection-format-string"
+        ]
+        assert len(sql) == 4
+        assert all(f.cwe == 89 for f in sql)
+        assert all(f.severity_hint == "high" for f in sql)
+
+    def test_sql_injection_rule_is_silent_on_parameterized_query(
+        self, tmp_path: Path
+    ) -> None:
+        _write(
+            tmp_path,
+            "db.py",
+            "def find(cursor, user_id):\n"
+            "    cursor.execute(\"SELECT * FROM users WHERE id=%s\", (user_id,))\n",
+        )
+        findings = list(SemgrepScanner().scan(tmp_path))
+        assert not any(
+            f.rule_id == "cortexward-sql-injection-format-string" for f in findings
+        )
+
     def test_hardcoded_credential_rule_fires_on_a_password_literal(self, tmp_path: Path) -> None:
         _write(tmp_path, "config.py", 'password = "hunter2CorrectHorse"\n')
         findings = list(SemgrepScanner().scan(tmp_path))
@@ -273,6 +307,7 @@ class TestPrivateHelpers:
             "template_injection.yml",
             "hardcoded_credentials.yml",
             "jwt_signature_bypass.yml",
+            "sql_injection.yml",
         }
 
     def test_rule_id_strips_the_directory_path_prefix(self) -> None:
